@@ -48,11 +48,11 @@ class Encryptor
   
   def crack(message)
     supported_characters.count.times.collect do |attempt|
-      decrypt(message, attempt)
+      encrypt(message, attempt, true)
     end
   end
 
-  
+
   private
 
   def cipher(rotation)
@@ -98,19 +98,3 @@ class Encryptor
     return_hash
   end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
