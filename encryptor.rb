@@ -1,21 +1,15 @@
 require 'digest/md5'
 
 class Encryptor
-  def cipher(rotation)
-    chars = (' '..'z').to_a
-    rot_chars = chars.rotate(rotation)
-    Hash[chars.zip(rot_chars)]
-  end
-  
-  def encrypt_letter(letter, rotation)
-    cipher_for_rotation = cipher(rotation)
-    cipher_for_rotation[letter]
+
+  def initialize
+    exit unless password_confirmed
   end
 
-  def encrypt(word, rotation)
+  def encrypt(word, rotation, decrypt=false)
     letters = word.split('')
     results = letters.collect do |letter|
-      encrypt_letter(letter, rotation)
+      decrypt ? decrypt_letter(letter, rotation) : encrypt_letter(letter, rotation)
     end
     results.join
   end
@@ -29,24 +23,11 @@ class Encryptor
     results.join
   end
 
-  def decrypt_letter(letter, rotation)
-    cipher_for_rotation = cipher(rotation).invert
-    cipher_for_rotation[letter]
-  end
-
-  def decrypt(word, rotation)
-    letters = word.split('')
-    results = letters.collect do |letter|
-      decrypt_letter(letter, rotation)
-    end
-    results.join
-  end
-
-  def encrypt_file(filename, rotation)
+  def encrypt_file(filename, rotation, decrypt=false)
     read_file = File.open filename, 'r'
-    encrypted_text = encrypt read_file.read, rotation
-    out_file = File.open "#{filename}.encrypted", 'w'
-    out_file.write encrypted_text
+    decrypt ? (text = encrypt read_file.read, rotation, true) : (text = encrypt read_file.read, rotation)
+    decrypt ? (out_file = File.open "#{filename}.decrypted", "w") : (out_file = File.open "#{filename}.encrypted", 'w')
+    out_file.write text
     out_file.close
     read_file.close
   end
@@ -60,20 +41,6 @@ class Encryptor
     read_file.close
   end
 
-  def pad_zip(big_array, small_array)
-    sm_index = 0
-    return_hash = {}
-    big_array.each do |key|
-      return_hash[key] = small_array[sm_index]
-      sm_index == small_array.count-1 ? sm_index = 0 : sm_index += 1
-    end
-    return_hash
-  end
-
-  def supported_characters
-    (' '..'z').to_a
-  end
-
   def crack(message)
     supported_characters.count.times.collect do |attempt|
       decrypt(message, attempt)
@@ -81,8 +48,6 @@ class Encryptor
   end
 
   def encription_writer
-    exit unless password_confirmed
-    
     puts "This script will encrypt all your text"
     puts "What rotation would you like to use?"
     rotation = gets.chomp.to_i
@@ -97,8 +62,6 @@ class Encryptor
   end
 
   def decryption_writer
-    exit unless password_confirmed
-
     puts "This script will decrypt a message for you"
     puts "What rotation is the message using?"
     rotation = gets.chomp.to_i
@@ -110,6 +73,29 @@ class Encryptor
       next if line == 'quit'
       puts "DECRYPTED ~> #{decrypt line, rotation}"
     end
+  end
+  
+
+  private
+
+  def cipher(rotation)
+    chars = (' '..'z').to_a
+    rot_chars = chars.rotate(rotation)
+    Hash[chars.zip(rot_chars)]
+  end
+  
+  def encrypt_letter(letter, rotation)
+    cipher_for_rotation = cipher(rotation)
+    cipher_for_rotation[letter]
+  end
+
+  def decrypt_letter(letter, rotation)
+    cipher_for_rotation = cipher(rotation).invert
+    cipher_for_rotation[letter]
+  end
+
+  def supported_characters
+    (' '..'z').to_a
   end
 
   def password_confirmed
@@ -123,6 +109,16 @@ class Encryptor
       end
     end
     false
+  end
+
+  def pad_zip(big_array, small_array)
+    sm_index = 0
+    return_hash = {}
+    big_array.each do |key|
+      return_hash[key] = small_array[sm_index]
+      sm_index == small_array.count-1 ? sm_index = 0 : sm_index += 1
+    end
+    return_hash
   end
 end
 
