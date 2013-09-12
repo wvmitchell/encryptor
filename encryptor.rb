@@ -38,17 +38,17 @@ class Encryptor
     end
   end
 
-  def encription_writer
-    puts "This script will encrypt all your text"
+  def encription_writer(decrypt=false)
+    puts "This script will #{decrypt ? 'decrypt' : 'encrypt'} all your text"
     puts "What rotation would you like to use?"
     rotation = gets.chomp.to_i
-    puts "Great! Just start writing. Press enter to encrypt your line, and type 'quit' to exit"
+    puts "Great! Just start writing. Press enter to #{decrypt ? 'decrypt' : 'encrypt'} your line, and type 'quit' to exit"
     line = ""
 
     until line == 'quit'
       line = gets.chomp
       next if line == 'quit'
-      puts "ENCRYPTED ~> #{encrypt line, rotation }"
+      puts "#{decrypt ? 'DECRYPTED' : 'ENCRYPTED'} ~> " + (decrypt ? "#{encrypt line, rotation, true}" : "#{encrypt line, rotation}")
     end
   end
 
