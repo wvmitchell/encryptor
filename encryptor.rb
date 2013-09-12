@@ -32,12 +32,6 @@ class Encryptor
     read_file.close
   end
 
-  def crack(message)
-    supported_characters.count.times.collect do |attempt|
-      decrypt(message, attempt)
-    end
-  end
-
   def encription_writer(decrypt=false)
     puts "This script will #{decrypt ? 'decrypt' : 'encrypt'} all your text"
     puts "What rotation would you like to use?"
@@ -51,22 +45,14 @@ class Encryptor
       puts "#{decrypt ? 'DECRYPTED' : 'ENCRYPTED'} ~> " + (decrypt ? "#{encrypt line, rotation, true}" : "#{encrypt line, rotation}")
     end
   end
-
-  def decryption_writer
-    puts "This script will decrypt a message for you"
-    puts "What rotation is the message using?"
-    rotation = gets.chomp.to_i
-    puts "Great! Just enter the encrypted message, and press enter to decrypt. Type 'quit' to exit"
-
-    line = ''
-    until line == 'quit'
-      line = gets.chomp
-      next if line == 'quit'
-      puts "DECRYPTED ~> #{decrypt line, rotation}"
+  
+  def crack(message)
+    supported_characters.count.times.collect do |attempt|
+      decrypt(message, attempt)
     end
   end
-  
 
+  
   private
 
   def cipher(rotation)
