@@ -32,15 +32,6 @@ class Encryptor
     read_file.close
   end
 
-  def decrypt_file(filename, rotation)
-    read_file = File.open filename, 'r'
-    decrypted_text = decrypt read_file.read, rotation
-    out_file = File.open "#{filename}.decrypted", 'w'
-    out_file.write decrypted_text
-    out_file.close
-    read_file.close
-  end
-
   def crack(message)
     supported_characters.count.times.collect do |attempt|
       decrypt(message, attempt)
